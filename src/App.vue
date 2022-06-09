@@ -1,26 +1,118 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+	<main>
+		<section class="banner">
+			<img src="@/assets/pokelogo.png" />
+		</section>
+
+		<section class="search">
+			<h4>PokeGuía</h4>
+			<form class="input-search" @submit.prevent="findPokemon(pokemonName)">
+				<p>Nombre:</p>
+				<input type="text" v-model="pokemonName" required />
+				<button class="btn btn-primary" type="submit">Buscar</button>
+			</form>
+		</section>
+
+		<section>
+			<img :src="pokemonFrontDefault" alt="" />
+		</section>
+		<div class="d-flex gap-4">
+			<section class="movements">
+				<h4>Movimientos</h4>
+				<ul class="list-group">
+					<li
+						class="list-group-item"
+						v-for="(move, $index) in pokemonMoves"
+						:key="$index"
+					>
+						{{ move }}
+					</li>
+				</ul>
+			</section>
+
+			<section class="abilities">
+				<h4>Habilidades</h4>
+				<ul class="list-group">
+					<li
+						class="list-group-item"
+						v-for="(ability, $index) in pokemonAbilities"
+						:key="$index"
+					>
+						{{ ability }}
+					</li>
+				</ul>
+			</section>
+		</div>
+	</main>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+	name: "App",
+	data: () => ({
+		pokemon: null,
+		pokemonName: "",
+	}),
+	mounted() {
+		this.findPokemon("pikachu");
+	},
+	computed: {
+		pokemonMoves() {
+			return this.pokemon?.moves?.map?.((move) => move.move.name) ?? [];
+		},
+		pokemonAbilities() {
+			return (
+				this.pokemon?.abilities?.map?.((ability) => ability.ability.name) ?? []
+			);
+		},
+		pokemonFrontDefault() {
+			return this.pokemon?.sprites?.front_default ?? "";
+		},
+	},
+	methods: {
+		async findPokemon(pokemonName) {
+			const pokemon = await fetch(
+				`https://pokeapi.co/api/v2/pokemon/${pokemonName}`
+			).then((response) => response.json());
+			this.pokemon = pokemon;
+		},
+	},
+};
 </script>
-
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+body {
+	margin: 0;
+	padding: 0;
+	background-color: black;
+	color: white;
+}
+main {
+	max-width: 400px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+.banner {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.banner img {
+	width: 50%;
+}
+.search {
+	text-align: center;
+}
+.search .input-search {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+}
+.search .input-search p {
+	margin: 0;
 }
 </style>
